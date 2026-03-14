@@ -1,0 +1,52 @@
+{
+  "landing": {
+    "nav": {
+      "features": "功能",
+      "pricing": "定价",
+      "openApp": "打开应用",
+      "signIn": "登录",
+      "getStarted": "开始使用"
+    },
+    "hero": {
+      "eyebrow": "通用 SaaS 模板",
+      "title": "更快发布你的下一个 SaaS。",
+      "subtitle": "中性前端模板，内置认证、多语言和订阅计费示例。",
+      "primaryCta": "创建账号",
+      "secondaryCta": "查看定价"
+    },
+    "features": {
+      "title": "内置示例",
+      "subtitle": "最小可用模块，快速起步且不包含具体产品文案。",
+      "cards": {
+        "i18n": {
+          "title": "多语言",
+          "body": "通过 i18next 在页头切换语言。"
+        },
+        "auth": {
+          "title": "认证",
+          "body": "已集成 Better Auth 邮箱登录与注册流程。"
+        },
+        "billing": {
+          "title": "订阅",
+          "body": "定价页支持 Polar 产品和结账流程。"
+        }
+      }
+    },
+    "footer": {
+      "text": "用于未来 SaaS 项目的基础模板。",
+      "pricing": "定价",
+      "login": "登录",
+      "register": "创建账号"
+    }
+  },
+  "pricing": {
+    "title": "定价",
+    "subtitle": "连接 Polar 产品后可显示真实套餐。未配置时会显示演示套餐。",
+    "loading": "正在加载套餐...",
+    "free": "免费",
+    "monthly": "/月",
+    "yearly": "/年",
+    "cta": "继续",
+    "processing": "处理中..."
+  }
+}

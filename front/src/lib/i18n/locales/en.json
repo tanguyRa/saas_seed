@@ -1,0 +1,52 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "openApp": "Open app",
+      "signIn": "Sign in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "eyebrow": "Generic SaaS starter",
+      "title": "Ship your next SaaS faster.",
+      "subtitle": "A neutral frontend template with auth, i18n, and billing examples wired in.",
+      "primaryCta": "Create account",
+      "secondaryCta": "See pricing"
+    },
+    "features": {
+      "title": "Included examples",
+      "subtitle": "Minimal building blocks to start quickly without product-specific copy.",
+      "cards": {
+        "i18n": {
+          "title": "Localization",
+          "body": "Switch language from the header using i18next resources."
+        },
+        "auth": {
+          "title": "Authentication",
+          "body": "Email sign-in/sign-up flows are ready via Better Auth."
+        },
+        "billing": {
+          "title": "Subscriptions",
+          "body": "Pricing page supports Polar products and checkout flow."
+        }
+      }
+    },
+    "footer": {
+      "text": "Seed template for future SaaS projects.",
+      "pricing": "Pricing",
+      "login": "Sign in",
+      "register": "Create account"
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Connect Polar products for live plans. Demo plans are shown until then.",
+    "loading": "Loading plans...",
+    "free": "Free",
+    "monthly": "/month",
+    "yearly": "/year",
+    "cta": "Continue",
+    "processing": "Processing..."
+  }
+}

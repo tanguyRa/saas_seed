@@ -1,0 +1,52 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Fonctionnalites",
+      "pricing": "Tarifs",
+      "openApp": "Ouvrir l'app",
+      "signIn": "Connexion",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "eyebrow": "Base SaaS generique",
+      "title": "Lancez votre prochain SaaS plus vite.",
+      "subtitle": "Template frontend neutre avec auth, i18n et billing pre-cables.",
+      "primaryCta": "Creer un compte",
+      "secondaryCta": "Voir les tarifs"
+    },
+    "features": {
+      "title": "Exemples inclus",
+      "subtitle": "Blocs minimaux pour demarrer vite, sans contenu produit.",
+      "cards": {
+        "i18n": {
+          "title": "Localisation",
+          "body": "Changez de langue depuis l'en-tete avec i18next."
+        },
+        "auth": {
+          "title": "Authentification",
+          "body": "Flux email connexion/inscription via Better Auth."
+        },
+        "billing": {
+          "title": "Abonnements",
+          "body": "La page tarifs supporte Polar et le checkout."
+        }
+      }
+    },
+    "footer": {
+      "text": "Template de base pour futurs projets SaaS.",
+      "pricing": "Tarifs",
+      "login": "Connexion",
+      "register": "Creer un compte"
+    }
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "subtitle": "Connectez vos produits Polar pour des offres reelles. Sinon, des plans demo sont affiches.",
+    "loading": "Chargement des offres...",
+    "free": "Gratuit",
+    "monthly": "/mois",
+    "yearly": "/an",
+    "cta": "Continuer",
+    "processing": "Traitement..."
+  }
+}

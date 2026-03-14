@@ -1,0 +1,52 @@
+{
+  "landing": {
+    "nav": {
+      "features": "Funciones",
+      "pricing": "Precios",
+      "openApp": "Abrir app",
+      "signIn": "Iniciar sesion",
+      "getStarted": "Empezar"
+    },
+    "hero": {
+      "eyebrow": "Base SaaS generica",
+      "title": "Lanza tu proximo SaaS mas rapido.",
+      "subtitle": "Plantilla frontend neutra con auth, i18n y cobros ya conectados.",
+      "primaryCta": "Crear cuenta",
+      "secondaryCta": "Ver precios"
+    },
+    "features": {
+      "title": "Ejemplos incluidos",
+      "subtitle": "Bloques minimos para empezar rapido sin texto especifico de producto.",
+      "cards": {
+        "i18n": {
+          "title": "Localizacion",
+          "body": "Cambia el idioma desde el encabezado con i18next."
+        },
+        "auth": {
+          "title": "Autenticacion",
+          "body": "Flujos de email para login/registro con Better Auth."
+        },
+        "billing": {
+          "title": "Suscripciones",
+          "body": "La pagina de precios soporta productos y checkout de Polar."
+        }
+      }
+    },
+    "footer": {
+      "text": "Plantilla semilla para futuros proyectos SaaS.",
+      "pricing": "Precios",
+      "login": "Iniciar sesion",
+      "register": "Crear cuenta"
+    }
+  },
+  "pricing": {
+    "title": "Precios",
+    "subtitle": "Conecta productos de Polar para planes reales. Mientras tanto se muestran planes demo.",
+    "loading": "Cargando planes...",
+    "free": "Gratis",
+    "monthly": "/mes",
+    "yearly": "/ano",
+    "cta": "Continuar",
+    "processing": "Procesando..."
+  }
+}
