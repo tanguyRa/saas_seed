@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { LayoutProps } from "./$types";
     import { useSession } from "$lib/auth-client";
+    import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
     import { goto } from "$app/navigation";
 
     let { children }: LayoutProps = $props();
@@ -16,6 +17,9 @@
 
 {#if !$session.data}
     <div class="auth-container">
+        <div class="auth-language">
+            <LanguageSwitcher />
+        </div>
         <div class="auth-card">
             {@render children()}
         </div>
@@ -29,5 +33,11 @@
 
     .avatar {
         margin: 0 auto var(--spacing-lg);
+    }
+
+    .auth-language {
+        position: absolute;
+        top: var(--spacing-md);
+        right: var(--spacing-md);
     }
 </style>

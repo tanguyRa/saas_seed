@@ -46,6 +46,32 @@ export function t(key: string): string {
 	return i18next.t(key);
 }
 
+export function tError(
+	rawMessage: string | undefined | null,
+	fallbackKey: string
+): string {
+	const message = (rawMessage || '').toLowerCase();
+	void currentLanguage;
+
+	if (!message) return i18next.t(fallbackKey);
+
+	if (
+		message.includes('failed to proxy request to go api') ||
+		message.includes('bad gateway') ||
+		message.includes('connectionrefused') ||
+		message.includes('failedtoopensocket') ||
+		message.includes('unable to connect')
+	) {
+		return i18next.t('common.errors.apiUnavailable');
+	}
+
+	if (message.includes('network') || message.includes('fetch')) {
+		return i18next.t('common.errors.network');
+	}
+
+	return i18next.t(fallbackKey);
+}
+
 export function getLanguage(): string {
 	return currentLanguage;
 }

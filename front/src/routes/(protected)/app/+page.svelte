@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
+    import { t } from "$lib/i18n/index.svelte";
     import { useUser } from "$lib/stores/user.svelte";
 
     interface SidebarItem {
@@ -63,13 +64,13 @@
         try {
             const response = await fetch("/api/library");
             if (!response.ok) {
-                throw new Error("Failed to load activity");
+                throw new Error(t("dashboard.errors.loadActivity"));
             }
             const data = (await response.json()) as LibraryResponse;
             sidebarItems = data.sidebar_items || [];
             stories = data.stories || [];
         } catch (err) {
-            libraryError = err instanceof Error ? err.message : "Failed to load activity";
+            libraryError = err instanceof Error ? err.message : t("dashboard.errors.loadActivity");
         } finally {
             libraryLoading = false;
             libraryRefreshing = false;
@@ -81,12 +82,12 @@
         try {
             const response = await fetch("/api/newsletters/inbox");
             if (!response.ok) {
-                throw new Error("Failed to load inbox address");
+                throw new Error(t("dashboard.errors.loadInbox"));
             }
             const data = (await response.json()) as NewsletterInboxResponse;
             inboxAddress = data.address;
         } catch (err) {
-            errorInbox = err instanceof Error ? err.message : "Failed to load inbox address";
+            errorInbox = err instanceof Error ? err.message : t("dashboard.errors.loadInbox");
         } finally {
             loadingInbox = false;
         }
@@ -99,7 +100,7 @@
             .filter(Boolean);
 
         if (urls.length === 0) {
-            errorLinks = "Add at least one URL";
+            errorLinks = t("dashboard.errors.addOneUrl");
             return;
         }
 
@@ -112,12 +113,12 @@
                 body: JSON.stringify({ urls })
             });
             if (!response.ok) {
-                throw new Error("Failed to save links");
+                throw new Error(t("dashboard.errors.saveLinks"));
             }
             linkInput = "";
             await loadLibrary();
         } catch (err) {
-            errorLinks = err instanceof Error ? err.message : "Failed to save links";
+            errorLinks = err instanceof Error ? err.message : t("dashboard.errors.saveLinks");
         } finally {
             savingLinks = false;
         }
@@ -130,19 +131,23 @@
             copied = true;
             setTimeout(() => (copied = false), 2000);
         } catch {
-            errorInbox = "Failed to copy inbox address";
+            errorInbox = t("dashboard.errors.copyInbox");
         }
     }
 
     function statusLabel(status: string) {
         const normalized = status.toLowerCase();
-        if (normalized === "ready" || normalized === "completed") return "Ready";
-        if (normalized === "enriched") return "Enriching";
-        if (normalized === "processing") return "Processing";
-        if (normalized === "fetched") return "Extracted";
-        if (normalized === "queued") return "Queued";
-        if (normalized === "failed") return "Failed";
+        if (normalized === "ready" || normalized === "completed") return t("dashboard.status.ready");
+        if (normalized === "enriched") return t("dashboard.status.enriching");
+        if (normalized === "processing") return t("dashboard.status.processing");
+        if (normalized === "fetched") return t("dashboard.status.extracted");
+        if (normalized === "queued") return t("dashboard.status.queued");
+        if (normalized === "failed") return t("dashboard.status.failed");
         return status;
+    }
+
+    function storyTypeLabel(type: "pipeline" | "newsletter"): string {
+        return type === "pipeline" ? t("dashboard.labels.article") : t("dashboard.labels.newsletter");
     }
 
     onMount(() => {
@@ -166,16 +171,16 @@
 <div class="dashboard">
     <header class="dashboard-header">
         <div class="header-content">
-            <h1>Welcome back {user.state.user?.name || "User"}</h1>
+            <h1>{t("dashboard.header.welcome")} {user.state.user?.name || t("dashboard.header.userFallback")}</h1>
             {#if !isPremium}
-                <span class="tier-badge free">Free Plan</span>
+                <span class="tier-badge free">{t("dashboard.header.freePlan")}</span>
             {:else}
-                <span class="tier-badge premium">Premium</span>
+                <span class="tier-badge premium">{t("dashboard.header.premiumPlan")}</span>
             {/if}
         </div>
         <div class="header-status">
             <span class:active={libraryRefreshing} class="pulse"></span>
-            <span>{libraryRefreshing ? "Syncing" : "Live"}</span>
+            <span>{libraryRefreshing ? t("dashboard.header.syncing") : t("dashboard.header.live")}</span>
         </div>
     </header>
 
@@ -184,17 +189,17 @@
             <div class="panel-card">
                 <div class="panel-header">
                     <div>
-                        <h2>Add new links</h2>
-                        <p>Drop links and we’ll craft a 10 min deep dive.</p>
+                        <h2>{t("dashboard.links.title")}</h2>
+                        <p>{t("dashboard.links.subtitle")}</p>
                     </div>
                 </div>
                 <textarea
                     bind:value={linkInput}
                     rows="4"
-                    placeholder="https://example.com/article\nhttps://another.com/post"
+                    placeholder={t("dashboard.links.placeholder")}
                 ></textarea>
-                <button class="btn-primary" on:click={saveLinks} disabled={savingLinks}>
-                    {savingLinks ? "Saving..." : "Save links"}
+                <button class="btn-primary" onclick={saveLinks} disabled={savingLinks}>
+                    {savingLinks ? t("dashboard.links.saving") : t("dashboard.links.save")}
                 </button>
                 {#if errorLinks}
                     <p class="error">{errorLinks}</p>
@@ -204,22 +209,22 @@
             <div class="panel-card inbox">
                 <div class="panel-header">
                     <div>
-                        <h2>Newsletter inbox</h2>
-                        <p>Forward newsletters to start generating stories.</p>
+                        <h2>{t("dashboard.inbox.title")}</h2>
+                        <p>{t("dashboard.inbox.subtitle")}</p>
                     </div>
                 </div>
                 <div class="inbox-card">
                     {#if loadingInbox}
-                        <span class="muted">Loading address...</span>
+                        <span class="muted">{t("dashboard.inbox.loading")}</span>
                     {:else if inboxAddress}
                         <span class="address">{inboxAddress}</span>
-                        <button class="btn-secondary" on:click={copyInbox}>
-                            {copied ? "Copied" : "Copy"}
+                        <button class="btn-secondary" onclick={copyInbox}>
+                            {copied ? t("dashboard.inbox.copied") : t("dashboard.inbox.copy")}
                         </button>
                     {:else if errorInbox}
                         <span class="error">{errorInbox}</span>
                     {:else}
-                        <span class="muted">Inbox not available</span>
+                        <span class="muted">{t("dashboard.inbox.unavailable")}</span>
                     {/if}
                 </div>
             </div>
@@ -227,15 +232,15 @@
             <div class="panel-card activity">
                 <div class="panel-header">
                     <div>
-                        <h2>Activity stream</h2>
-                        <p>Links and newsletters in motion.</p>
+                        <h2>{t("dashboard.activity.title")}</h2>
+                        <p>{t("dashboard.activity.subtitle")}</p>
                     </div>
                 </div>
 
                 {#if libraryLoading}
-                    <p class="muted">Loading activity...</p>
+                    <p class="muted">{t("dashboard.activity.loading")}</p>
                 {:else if sidebarItems.length === 0}
-                    <p class="muted">No activity yet. Add a link to start.</p>
+                    <p class="muted">{t("dashboard.activity.empty")}</p>
                 {:else}
                     <ul class="activity-list">
                         {#each sidebarItems as item}
@@ -254,7 +259,7 @@
                                     <p class="activity-subtitle">{item.subtitle}</p>
                                 {/if}
                                 <div class="activity-meta">
-                                    <span class="type-pill">{item.type === "link" ? "Link" : "Newsletter"}</span>
+                                    <span class="type-pill">{item.type === "link" ? t("dashboard.labels.link") : t("dashboard.labels.newsletter")}</span>
                                     <span>{new Date(item.created_at).toLocaleString()}</span>
                                 </div>
                             </li>
@@ -267,8 +272,8 @@
         <section class="stories-panel">
             <div class="stories-header">
                 <div>
-                    <h2>Your stories</h2>
-                    <p>Curated, long-form learning updates crafted for you.</p>
+                    <h2>{t("dashboard.stories.title")}</h2>
+                    <p>{t("dashboard.stories.subtitle")}</p>
                 </div>
             </div>
 
@@ -276,8 +281,8 @@
                 <p class="error">{libraryError}</p>
             {:else if stories.length === 0}
                 <div class="empty-state">
-                    <h3>No stories yet</h3>
-                    <p>Drop a link or forward a newsletter to generate your first story.</p>
+                    <h3>{t("dashboard.stories.emptyTitle")}</h3>
+                    <p>{t("dashboard.stories.emptyBody")}</p>
                 </div>
             {:else}
                 <div class="story-grid">
@@ -285,9 +290,9 @@
                         <a class="story-card" href={`/stories/${story.id}?type=${story.type}`}>
                             <div class="story-card-header">
                                 <span class={`type-pill type-${story.type}`}>
-                                    {story.type === "pipeline" ? "Article" : "Newsletter"}
+                                    {storyTypeLabel(story.type)}
                                 </span>
-                                <span class="read-time">{story.read_minutes} min read</span>
+                                <span class="read-time">{story.read_minutes} {t("dashboard.stories.minRead")}</span>
                             </div>
                             <h3>{story.title}</h3>
                             <p>{story.summary}</p>
@@ -300,7 +305,7 @@
                             {/if}
                             <div class="story-footer">
                                 <span>{new Date(story.created_at).toLocaleDateString()}</span>
-                                <span class="cta">Read</span>
+                                <span class="cta">{t("dashboard.stories.read")}</span>
                             </div>
                         </a>
                     {/each}

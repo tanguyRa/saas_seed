@@ -2,6 +2,7 @@
     import { checkout, useSession } from "$lib/auth-client";
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
+    import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
     import { t } from "$lib/i18n/index.svelte";
 
     interface ProductPrice {
@@ -100,6 +101,7 @@
 <div class="pricing-page">
     <header>
         <a href="/">SaaS Seed</a>
+        <LanguageSwitcher />
     </header>
 
     <main>
@@ -156,6 +158,9 @@
         margin: 0 auto;
         padding: var(--space-5) var(--space-6);
         font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     main {

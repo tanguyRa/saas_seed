@@ -15,7 +15,7 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 2s
+      interval: 1s
       timeout: 2s
       retries: 10
       start_period: 2s
@@ -91,7 +91,7 @@ services:
       - PAYMENT_PROVIDER=${PAYMENT_PROVIDER}
       - POLAR_SUCCESS_URL=${POLAR_SUCCESS_URL}
     volumes:
-      - ./app:/app
+      - ./front:/app
       - /app/node_modules
       - /app/.svelte-kit
     depends_on:

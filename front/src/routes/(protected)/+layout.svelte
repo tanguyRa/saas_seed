@@ -1,6 +1,8 @@
 <script lang="ts">
     import type { LayoutProps } from "./$types";
     import { signOut } from "$lib/auth-client";
+    import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
+    import { t } from "$lib/i18n/index.svelte";
     import { useUser, resetUserStore } from "$lib/stores/user.svelte";
     import { goto } from "$app/navigation";
 
@@ -66,7 +68,7 @@
                 <button
                     class="toggle-btn"
                     onclick={toggleSidebar}
-                    aria-label="Toggle sidebar"
+                    aria-label={t("protected.sidebar.toggle")}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -92,8 +94,11 @@
                 <div class="nav-section"></div>
 
                 <div class="nav-section nav-section-bottom">
+                    <div class="sidebar-language">
+                        <LanguageSwitcher />
+                    </div>
                     <span class="nav-section-label"
-                        >{sidebarCollapsed ? "" : "Settings"}</span
+                        >{sidebarCollapsed ? "" : t("protected.sidebar.settings")}</span
                     >
                     <a href="/settings/profile" class="nav-link">
                         <svg
@@ -112,7 +117,7 @@
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                         {#if !sidebarCollapsed}
-                            <span>Profile</span>
+                            <span>{t("protected.sidebar.profile")}</span>
                         {/if}
                     </a>
                     <a href="/settings/billing" class="nav-link">
@@ -138,7 +143,7 @@
                             <line x1="1" y1="10" x2="23" y2="10"></line>
                         </svg>
                         {#if !sidebarCollapsed}
-                            <span>Billing</span>
+                            <span>{t("protected.sidebar.billing")}</span>
                         {/if}
                     </a>
                     <a href="/settings/api-keys" class="nav-link">
@@ -158,10 +163,14 @@
                             ></path>
                         </svg>
                         {#if !sidebarCollapsed}
-                            <span>API Keys</span>
+                            <span>{t("protected.sidebar.apiKeys")}</span>
                         {/if}
                     </a>
-                    <button class="nav-link logout-btn" onclick={handleLogout}>
+                    <button
+                        class="nav-link logout-btn"
+                        onclick={handleLogout}
+                        aria-label={t("protected.sidebar.logout")}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -179,7 +188,7 @@
                             <line x1="21" y1="12" x2="9" y2="12"></line>
                         </svg>
                         {#if !sidebarCollapsed}
-                            <span>Logout</span>
+                            <span>{t("protected.sidebar.logout")}</span>
                         {/if}
                     </button>
                 </div>
@@ -314,6 +323,13 @@
         margin-top: auto;
         border-top: 1px solid var(--color-border-light);
         padding-top: var(--spacing-md);
+    }
+
+    .sidebar-language {
+        display: flex;
+        justify-content: flex-start;
+        padding: 0 var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
     }
 
     .nav-section-label {

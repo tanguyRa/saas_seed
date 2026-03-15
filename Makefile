@@ -2,9 +2,10 @@ DEV_COMPOSE=docker compose --env-file .env.dev -f compose.yml -p ${PROJECT_NAME}
 
 PROJECT_NAME ?= project
 DOCKER_TARGET ?= development
+BACKEND_SERVICE := back
 
 .PHONY: help build start stop restart logs clean \
-        migrate-up migrate-down migration sqlc \
+        check-backend-running migrate-up migrate-down migration sqlc \
         front back test
 
 # ============================================
@@ -69,14 +70,17 @@ clean:
 # ============================================
 # Database Management
 # ============================================
-migrate: migrate-up
-migrate-up:
-	@echo "Applying migrations..."
-	${DEV_COMPOSE} exec back sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" up ${N}'
+check-backend-running:
+	@${DEV_COMPOSE} ps --status running --services | grep -qx "${BACKEND_SERVICE}" || (echo "backend service '${BACKEND_SERVICE}' is not running. Start it with 'make start'."; exit 1)
 
-migrate-down:
+migrate: migrate-up
+migrate-up: check-backend-running
+	@echo "Applying migrations..."
+	${DEV_COMPOSE} exec ${BACKEND_SERVICE} sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" up ${N}'
+
+migrate-down: check-backend-running
 	@echo "Rolling back $(if $(N),$(N),1) migrations..."
-	${DEV_COMPOSE} exec back sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" down $(if $(N),$(N),1)'
+	${DEV_COMPOSE} exec ${BACKEND_SERVICE} sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" down $(if $(N),$(N),1)'
 
 migration:
 	@if [ -z "$(name)" ]; then \
@@ -89,9 +93,9 @@ migration:
 	@touch db/migrations/$$(date +%Y%m%d%H%M%S)_$(name).down.sql
 	@echo "Created migration files"
 
-sqlc:
+sqlc: check-backend-running
 	@echo "Generating SQL code..."
-	${DEV_COMPOSE} exec back go run -mod=mod github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate -f /db/sqlc.yml
+	${DEV_COMPOSE} exec ${BACKEND_SERVICE} go run -mod=mod github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate -f /db/sqlc.yml
 	@echo "Done"
 
 # ============================================
@@ -101,10 +105,10 @@ front:
 	${DEV_COMPOSE} exec front sh
 
 back:
-	${DEV_COMPOSE} exec back sh
+	${DEV_COMPOSE} exec ${BACKEND_SERVICE} sh
 
 test:
-	${DEV_COMPOSE} exec back go test ./...
+	${DEV_COMPOSE} exec ${BACKEND_SERVICE} go test ./...
 	docker run --rm --env-file .env.dev -v ./worker:/app -w /app golang:1.25-alpine sh -c "apk add --no-cache git >/dev/null && go test ./..."
 
 # ============================================

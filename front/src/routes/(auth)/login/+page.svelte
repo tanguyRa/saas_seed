@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { signIn } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
+	import { t, tError } from '$lib/i18n/index.svelte';
 
 	let email = $state('');
 	let password = $state('');
@@ -19,12 +20,12 @@
 			});
 
 			if (result.error) {
-				error = result.error.message || 'Login failed';
+				error = tError(result.error.message, 'auth.login.errors.failed');
 			} else {
 				goto('/app');
 			}
 		} catch (err) {
-			error = 'An unexpected error occurred';
+			error = tError(err instanceof Error ? err.message : null, 'common.errors.unexpected');
 		} finally {
 			loading = false;
 		}
@@ -34,8 +35,8 @@
 <div class="auth-header">
 	<a href="/" class="auth-logo">SaaS Seed</a>
 	<div>
-		<h1>Sign in</h1>
-		<p class="auth-subtitle">Access your workspace</p>
+		<h1>{t('auth.login.title')}</h1>
+		<p class="auth-subtitle">{t('auth.login.subtitle')}</p>
 	</div>
 </div>
 
@@ -45,32 +46,32 @@
 
 <form onsubmit={handleSubmit}>
 	<div class="form-group">
-		<label for="email">Email</label>
+		<label for="email">{t('auth.fields.email')}</label>
 		<input
 			type="email"
 			id="email"
 			bind:value={email}
 			required
-			placeholder="you@example.com"
+			placeholder={t('auth.fields.emailPlaceholder')}
 		/>
 	</div>
 
 	<div class="form-group">
-		<label for="password">Password</label>
+		<label for="password">{t('auth.fields.password')}</label>
 		<input
 			type="password"
 			id="password"
 			bind:value={password}
 			required
-			placeholder="••••••••"
+			placeholder={t('auth.fields.passwordPlaceholder')}
 		/>
 	</div>
 
 	<button type="submit" class="btn btn-primary" disabled={loading}>
-		{loading ? 'Signing in...' : 'Sign In'}
+		{loading ? t('auth.login.actions.signingIn') : t('auth.login.actions.signIn')}
 	</button>
 </form>
 
 <p class="auth-footer">
-	Don't have an account? <a href="/register">Sign up</a>
+	{t('auth.login.footer.noAccount')} <a href="/register">{t('auth.login.footer.signUp')}</a>
 </p>

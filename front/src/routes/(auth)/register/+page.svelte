@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { signUp } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
+	import { t, tError } from '$lib/i18n/index.svelte';
 
 	let name = $state('');
 	let email = $state('');
@@ -21,12 +22,12 @@
 			});
 
 			if (result.error) {
-				error = result.error.message || 'Registration failed';
+				error = tError(result.error.message, 'auth.register.errors.failed');
 			} else {
 				goto('/app');
 			}
 		} catch (err) {
-			error = 'An unexpected error occurred';
+			error = tError(err instanceof Error ? err.message : null, 'common.errors.unexpected');
 		} finally {
 			loading = false;
 		}
@@ -36,8 +37,8 @@
 <div class="auth-header">
 	<a href="/" class="auth-logo">SaaS Seed</a>
 	<div>
-		<h1>Create account</h1>
-		<p class="auth-subtitle">Set up your workspace</p>
+		<h1>{t('auth.register.title')}</h1>
+		<p class="auth-subtitle">{t('auth.register.subtitle')}</p>
 	</div>
 </div>
 
@@ -47,44 +48,46 @@
 
 <form onsubmit={handleSubmit}>
 	<div class="form-group">
-		<label for="name">Name</label>
+		<label for="name">{t('auth.fields.name')}</label>
 		<input
 			type="text"
 			id="name"
 			bind:value={name}
 			required
-			placeholder="John Doe"
+			placeholder={t('auth.fields.namePlaceholder')}
 		/>
 	</div>
 
 	<div class="form-group">
-		<label for="email">Email</label>
+		<label for="email">{t('auth.fields.email')}</label>
 		<input
 			type="email"
 			id="email"
 			bind:value={email}
 			required
-			placeholder="you@example.com"
+			placeholder={t('auth.fields.emailPlaceholder')}
 		/>
 	</div>
 
 	<div class="form-group">
-		<label for="password">Password</label>
+		<label for="password">{t('auth.fields.password')}</label>
 		<input
 			type="password"
 			id="password"
 			bind:value={password}
 			required
-			placeholder="••••••••"
+			placeholder={t('auth.fields.passwordPlaceholder')}
 			minlength="8"
 		/>
 	</div>
 
 	<button type="submit" class="btn btn-primary" disabled={loading}>
-		{loading ? 'Creating account...' : 'Create Account'}
+		{loading
+			? t('auth.register.actions.creatingAccount')
+			: t('auth.register.actions.createAccount')}
 	</button>
 </form>
 
 <p class="auth-footer">
-	Already have an account? <a href="/login">Sign in</a>
+	{t('auth.register.footer.hasAccount')} <a href="/login">{t('auth.register.footer.signIn')}</a>
 </p>
