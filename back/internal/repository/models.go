@@ -37,7 +37,7 @@ type Event struct {
 
 type Jwk struct {
 	ID         uuid.UUID  `json:"id"`
-	UserId     uuid.UUID  `json:"userId"`
+	UserId     *uuid.UUID `json:"userId"`
 	PublicKey  string     `json:"publicKey"`
 	PrivateKey string     `json:"privateKey"`
 	CreatedAt  time.Time  `json:"createdAt"`

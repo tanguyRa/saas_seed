@@ -45,7 +45,7 @@ repository/
 ├── models.go
 │   ├── type Account {ID: uuid.UUID, UserId: uuid.UUID, AccountId: string, ProviderId: string, AccessToken: *string, RefreshToken: *string, AccessTokenExpiresAt: *time.Time, RefreshTokenExpiresAt: *time.Time, Scope: *string, IdToken: *string, Password: *string, CreatedAt: time.Time, UpdatedAt: time.Time}
 │   ├── type Event {ID: uuid.UUID, UserId: uuid.UUID, Data: []byte, Type: string, CreatedAt: time.Time, UpdatedAt: time.Time}
-│   ├── type Jwk {ID: uuid.UUID, UserId: uuid.UUID, PublicKey: string, PrivateKey: string, CreatedAt: time.Time, ExpiresAt: *time.Time}
+│   ├── type Jwk {ID: uuid.UUID, UserId: *uuid.UUID, PublicKey: string, PrivateKey: string, CreatedAt: time.Time, ExpiresAt: *time.Time}
 │   ├── type Session {ID: uuid.UUID, UserId: uuid.UUID, Token: string, ExpiresAt: time.Time, IpAddress: *string, UserAgent: *string, CreatedAt: time.Time, UpdatedAt: time.Time}
 │   ├── type Subscription {ID: uuid.UUID, UserId: uuid.UUID, ExternalId: *string, Tier: string, CancelAtPeriodEnd: bool, Status: string, CurrentPeriodEnd: *time.Time, CreatedAt: time.Time, UpdatedAt: time.Time}
 │   ├── type User {ID: uuid.UUID, Name: string, Email: string, EmailVerified: bool, Image: *string, CreatedAt: time.Time, UpdatedAt: time.Time}

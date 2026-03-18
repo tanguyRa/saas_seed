@@ -19,18 +19,18 @@ type Collector struct {
 func parseGoFile(filePath string, fileNode *FileNode) error {
 	fset := token.NewFileSet()
 	// Parse the file including comments if needed
-	f, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
+	file, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
 	if err != nil {
 		return err
 	}
 
-	c := &Collector{
+	collector := &Collector{
 		Fset:     fset,
 		FileNode: fileNode,
 	}
 
 	// Use ast.Walk with a custom visitor for cleaner routing
-	ast.Walk(c, f)
+	ast.Walk(collector, file)
 	return nil
 }
 
@@ -104,26 +104,22 @@ func (c *Collector) handleType(x *ast.TypeSpec) {
 	c.FileNode.Types = append(c.FileNode.Types, typeInfo)
 }
 
-func (c *Collector) handleFunc(x *ast.FuncDecl) {
+func (c *Collector) handleFunc(funcNode *ast.FuncDecl) {
 	var sig strings.Builder
 
-	// 1. Start with "func "
 	sig.WriteString("func ")
 
-	// 2. Add Receiver with parentheses: "(*Queries) "
-	if x.Recv != nil && len(x.Recv.List) > 0 {
-		// We wrap the type in parens manually because format.Node
+	if funcNode.Recv != nil && len(funcNode.Recv.List) > 0 {
+		// Wrap the type in parens manually because format.Node
 		// on a lone type node won't include them.
-		typeName := nodeToSingleLineString(c.Fset, x.Recv.List[0].Type)
+		typeName := nodeToSingleLineString(c.Fset, funcNode.Recv.List[0].Type)
 		sig.WriteString(fmt.Sprintf("(%s) ", typeName))
 	}
 
-	// 3. Add Function Name: "GetJwksSets"
-	sig.WriteString(x.Name.Name)
+	sig.WriteString(funcNode.Name.Name)
 
-	// 4. Add Signature: "(ctx context.Context) ([]GetJwksSetsRow, error)"
-	// We format x.Type (the FuncType) and strip the leading "func"
-	fullSig := nodeToSingleLineString(c.Fset, x.Type)
+	// Format funcNode.Type (the FuncType) and strip the leading "func"
+	fullSig := nodeToSingleLineString(c.Fset, funcNode.Type)
 	sig.WriteString(strings.TrimPrefix(fullSig, "func"))
 
 	c.FileNode.Funcs = append(c.FileNode.Funcs, sig.String())
