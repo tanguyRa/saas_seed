@@ -1,7 +1,6 @@
+PROJECT_NAME ?= project
 DEV_COMPOSE=docker compose --env-file .env.dev -f compose.yml -p ${PROJECT_NAME}
 
-PROJECT_NAME ?= project
-DOCKER_TARGET ?= development
 BACKEND_SERVICE := back
 
 .PHONY: help build start stop restart logs clean \
@@ -40,20 +39,16 @@ help:
 # Development
 # ============================================
 start: build start-all migrate
-	@echo ""
-	@echo "Done. Happy coding!"
 
 build:
 	${DEV_COMPOSE} build --pull
 
 start-all:
-	@echo "Starting ${PROJECT_NAME}..."
-	${DEV_COMPOSE} up -d --remove-orphans
-	@echo ""
-	@echo "Services running:"
-	@echo "  - front (SvelteKit frontend): http://localhost:3000"
-	@echo "  - back (Go backend):         http://localhost:8080"
-	@echo "  - db (local database):     http://localhost:5432"
+	@if command -v op >/dev/null 2>&1; then \
+		op run --env-file=".env.dev" -- ${DEV_COMPOSE} up -d --remove-orphans; \
+	else \
+		${DEV_COMPOSE} up -d --remove-orphans; \
+	fi
 
 stop:
 	${DEV_COMPOSE} down
@@ -76,11 +71,11 @@ check-backend-running:
 migrate: migrate-up
 migrate-up: check-backend-running
 	@echo "Applying migrations..."
-	${DEV_COMPOSE} exec ${BACKEND_SERVICE} sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" up ${N}'
+	${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" up ${N}'
 
 migrate-down: check-backend-running
 	@echo "Rolling back $(if $(N),$(N),1) migrations..."
-	${DEV_COMPOSE} exec ${BACKEND_SERVICE} sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" down $(if $(N),$(N),1)'
+	${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'migrate -path /db/migrations -database "$$DATABASE_URL" down $(if $(N),$(N),1)'
 
 migration:
 	@if [ -z "$(name)" ]; then \
@@ -95,20 +90,20 @@ migration:
 
 sqlc: check-backend-running
 	@echo "Generating SQL code..."
-	${DEV_COMPOSE} exec ${BACKEND_SERVICE} go run -mod=mod github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate -f /db/sqlc.yml
+	${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} go run -mod=mod github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate -f /db/sqlc.yml
 	@echo "Done"
 
 # ============================================
 # Utilities
 # ============================================
 front:
-	${DEV_COMPOSE} exec front sh
+	${DEV_COMPOSE} exec -it front sh
 
 back:
-	${DEV_COMPOSE} exec ${BACKEND_SERVICE} sh
+	${DEV_COMPOSE} exec -it ${BACKEND_SERVICE} sh
 
 test:
-	${DEV_COMPOSE} exec ${BACKEND_SERVICE} go test ./...
+	${DEV_COMPOSE} exec -it ${BACKEND_SERVICE} go test ./...
 	docker run --rm --env-file .env.dev -v ./worker:/app -w /app golang:1.25-alpine sh -c "apk add --no-cache git >/dev/null && go test ./..."
 
 # ============================================

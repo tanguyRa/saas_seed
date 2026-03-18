@@ -55,7 +55,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
       - MINIO_BUCKET=${MINIO_BUCKET:-bucket}
       - MINIO_USE_SSL=${MINIO_USE_SSL:-false}
-      - MINIO_PUBLIC_BASE_URL=${MINIO_PUBLIC_BASE_URL:-http://localhost:9000/bucket}
+      - MINIO_PUBLIC_BASE_URL=${MINIO_PUBLIC_BASE_URL:-http://127.0.0.1:9000/bucket}
       # Front<->back security
       - JWT_ISSUER=${JWT_ISSUER}
       - JWT_AUDIENCE=${JWT_AUDIENCE}
