@@ -1,5 +1,6 @@
 PROJECT_NAME ?= project
 DEV_COMPOSE=docker --log-level error compose -f compose.yml -p ${PROJECT_NAME}
+SECURE_COMPOSE=op run --env-file=".env.dev" -- docker compose -f compose.yml -p ${PROJECT_NAME}
 
 BACKEND_SERVICE := back
 
@@ -32,6 +33,7 @@ help:
 	@echo "  test          Run tests"
 	@echo "  stats         Show container statistics"
 	@echo "  pull          Pull latest images"
+	@echo "  db_env        Show database environment variable to verify 1password/docker setup"
 	@echo ""
 	@echo "Production:"
 	@echo "  build-prod    Build production images"
@@ -43,10 +45,10 @@ start: build start-all migrate
 	@echo "Started all services and applied migrations. Access the app at http://127.0.0.1:3000"
 
 build:
-	op run --env-file=".env.dev" -- docker compose -f compose.yml -p ${PROJECT_NAME} build --pull
+	${SECURE_COMPOSE} build --pull
 
 start-all:
-	op run --env-file=".env.dev" -- docker compose -f compose.yml -p ${PROJECT_NAME} up -d --remove-orphans
+	${SECURE_COMPOSE} up -d --remove-orphans
 
 stop:
 	${DEV_COMPOSE} down
