@@ -1,5 +1,5 @@
 PROJECT_NAME ?= project
-DEV_COMPOSE=docker compose --env-file .env.dev -f compose.yml -p ${PROJECT_NAME}
+DEV_COMPOSE=docker --log-level error compose -f compose.yml -p ${PROJECT_NAME}
 
 BACKEND_SERVICE := back
 
@@ -14,7 +14,7 @@ help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Development:"
-	@echo "  start         Start all services (front, back, db)"
+	@echo "  start         Start all services (open app at 127.0.0.1:3000)"
 	@echo "  stop          Stop all services"
 	@echo "  restart       Restart all services"
 	@echo "  logs          View logs from all services"
@@ -30,6 +30,7 @@ help:
 	@echo "  front         SSH into frontend container"
 	@echo "  back          SSH into backend container"
 	@echo "  test          Run tests"
+	@echo "  stats         Show container statistics"
 	@echo "  pull          Pull latest images"
 	@echo ""
 	@echo "Production:"
@@ -39,16 +40,13 @@ help:
 # Development
 # ============================================
 start: build start-all migrate
+	@echo "Started all services and applied migrations. Access the app at http://127.0.0.1:3000"
 
 build:
-	${DEV_COMPOSE} build --pull
+	op run --env-file=".env.dev" -- docker compose -f compose.yml -p ${PROJECT_NAME} build --pull
 
 start-all:
-	@if command -v op >/dev/null 2>&1; then \
-		op run --env-file=".env.dev" -- ${DEV_COMPOSE} up -d --remove-orphans; \
-	else \
-		${DEV_COMPOSE} up -d --remove-orphans; \
-	fi
+	op run --env-file=".env.dev" -- docker compose -f compose.yml -p ${PROJECT_NAME} up -d --remove-orphans
 
 stop:
 	${DEV_COMPOSE} down
@@ -102,9 +100,15 @@ front:
 back:
 	${DEV_COMPOSE} exec -it ${BACKEND_SERVICE} sh
 
+stats:
+	docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}"
+
 test:
 	${DEV_COMPOSE} exec -it ${BACKEND_SERVICE} go test ./...
 	docker run --rm --env-file .env.dev -v ./worker:/app -w /app golang:1.25-alpine sh -c "apk add --no-cache git >/dev/null && go test ./..."
+
+db_env:
+	op run --env-file=".env.dev" -- ${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'printenv | grep DATABASE_URL'
 
 # ============================================
 # Production
