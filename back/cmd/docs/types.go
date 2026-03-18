@@ -17,6 +17,7 @@ type TypeInfo struct {
 type PropertyInfo struct {
 	Name string
 	Type string
+	Tag  string
 }
 
 // Node represents a directory node in the file tree

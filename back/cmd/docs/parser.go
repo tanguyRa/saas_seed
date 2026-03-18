@@ -1,119 +1,139 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"strings"
 )
 
-// parseGoFile parses a Go file and extracts types and functions
+// Collector holds the state during AST traversal (Separation of Concerns)
+type Collector struct {
+	Fset     *token.FileSet
+	FileNode *FileNode
+}
+
 func parseGoFile(filePath string, fileNode *FileNode) error {
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, filePath, nil, 0)
+	// Parse the file including comments if needed
+	f, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
 	if err != nil {
 		return err
 	}
 
-	ast.Inspect(f, func(n ast.Node) bool {
-		switch x := n.(type) {
-		case *ast.TypeSpec:
-			typeInfo := TypeInfo{
-				Name:       x.Name.Name,
-				Properties: make([]PropertyInfo, 0),
-			}
+	c := &Collector{
+		Fset:     fset,
+		FileNode: fileNode,
+	}
 
-			// Extract struct fields
-			switch t := x.Type.(type) {
-			case *ast.StructType:
-				if t.Fields != nil {
-					for _, field := range t.Fields.List {
-						if len(field.Names) == 0 {
-							// Handle embedded/anonymous fields
-							prop := PropertyInfo{
-								Name: fmt.Sprintf("*%s", exprToString(field.Type)), // Mark as embedded
-								Type: "embedded",
-							}
-							typeInfo.Properties = append(typeInfo.Properties, prop)
-						} else {
-							// Handle named fields
-							for _, name := range field.Names {
-								prop := PropertyInfo{
-									Name: name.Name,
-									Type: exprToString(field.Type),
-								}
-								typeInfo.Properties = append(typeInfo.Properties, prop)
-							}
-						}
-					}
-				}
-			default:
-				// For non-struct types, store the underlying type as a special property
-				typeInfo.Properties = append(typeInfo.Properties, PropertyInfo{
-					Name: "__underlying", // Special marker for underlying type
-					Type: exprToString(x.Type),
-				})
-			}
-
-			fileNode.Types = append(fileNode.Types, typeInfo)
-		case *ast.FuncDecl:
-			funcSig := buildFunctionSignature(x)
-			fileNode.Funcs = append(fileNode.Funcs, funcSig)
-		}
-		return true
-	})
-
+	// Use ast.Walk with a custom visitor for cleaner routing
+	ast.Walk(c, f)
 	return nil
 }
 
-// buildFunctionSignature creates a function signature string from an AST function declaration
-func buildFunctionSignature(x *ast.FuncDecl) string {
-	funcSig := "func "
-	if x.Recv != nil {
-		recv := x.Recv.List[0]
-		recvType := exprToString(recv.Type)
-		funcSig += fmt.Sprintf("(%s) ", recvType)
+// Visit implements the ast.Visitor interface
+func (c *Collector) Visit(n ast.Node) ast.Visitor {
+	switch x := n.(type) {
+	case *ast.TypeSpec:
+		c.handleType(x)
+	case *ast.FuncDecl:
+		c.handleFunc(x)
 	}
-	funcSig += x.Name.Name
-	funcSig += "("
-	
-	// Add parameters
-	if x.Type.Params != nil {
-		params := make([]string, 0)
-		for _, p := range x.Type.Params.List {
-			paramType := exprToString(p.Type)
-			if len(p.Names) == 0 {
-				params = append(params, paramType)
-			} else {
-				for _, name := range p.Names {
-					params = append(params, fmt.Sprintf("%s %s", name.Name, paramType))
-				}
-			}
-		}
-		funcSig += strings.Join(params, ", ")
-	}
-	funcSig += ")"
+	return c
+}
 
-	// Add return types
-	if x.Type.Results != nil {
-		returns := make([]string, 0)
-		for _, r := range x.Type.Results.List {
-			returnType := exprToString(r.Type)
-			if len(r.Names) == 0 {
-				returns = append(returns, returnType)
+func (c *Collector) handleType(x *ast.TypeSpec) {
+	typeInfo := TypeInfo{
+		Name:       x.Name.Name,
+		Properties: []PropertyInfo{},
+	}
+
+	switch t := x.Type.(type) {
+	case *ast.InterfaceType:
+		// Interfaces: type Provider interface { Chat(...) }
+		for _, field := range t.Methods.List {
+			// By formatting field.Type (the FuncType) and field.Names,
+			// we skip the field.Doc and field.Comment nodes.
+			methodName := ""
+			if len(field.Names) > 0 {
+				methodName = field.Names[0].Name
+			}
+
+			methodSig := nodeToSingleLineString(c.Fset, field.Type)
+			// Clean "func" from "func(ctx...) error"
+			cleanSig := strings.TrimPrefix(methodSig, "func")
+
+			typeInfo.Properties = append(typeInfo.Properties, PropertyInfo{
+				Name: methodName,
+				Type: cleanSig,
+			})
+		}
+
+	case *ast.StructType:
+		// Structs: type User struct { Name string }
+		for _, field := range t.Fields.List {
+			typeStr := nodeToSingleLineString(c.Fset, field.Type)
+
+			// If no names, it's an embedded struct
+			if len(field.Names) == 0 {
+				typeInfo.Properties = append(typeInfo.Properties, PropertyInfo{
+					Name: "embedded",
+					Type: typeStr,
+				})
 			} else {
-				for _, name := range r.Names {
-					returns = append(returns, fmt.Sprintf("%s %s", name.Name, returnType))
+				for _, name := range field.Names {
+					typeInfo.Properties = append(typeInfo.Properties, PropertyInfo{
+						Name: name.Name,
+						Type: typeStr,
+					})
 				}
 			}
 		}
-		if len(returns) == 1 && len(x.Type.Results.List[0].Names) == 0 {
-			funcSig += " " + returns[0]
-		} else {
-			funcSig += " (" + strings.Join(returns, ", ") + ")"
-		}
+
+	default:
+		// Basic types: type MyInt int
+		typeInfo.Properties = append(typeInfo.Properties, PropertyInfo{
+			Name: "__underlying",
+			Type: nodeToSingleLineString(c.Fset, x.Type),
+		})
 	}
-	
-	return funcSig
+
+	c.FileNode.Types = append(c.FileNode.Types, typeInfo)
+}
+
+func (c *Collector) handleFunc(x *ast.FuncDecl) {
+	var sig strings.Builder
+
+	// 1. Start with "func "
+	sig.WriteString("func ")
+
+	// 2. Add Receiver with parentheses: "(*Queries) "
+	if x.Recv != nil && len(x.Recv.List) > 0 {
+		// We wrap the type in parens manually because format.Node
+		// on a lone type node won't include them.
+		typeName := nodeToSingleLineString(c.Fset, x.Recv.List[0].Type)
+		sig.WriteString(fmt.Sprintf("(%s) ", typeName))
+	}
+
+	// 3. Add Function Name: "GetJwksSets"
+	sig.WriteString(x.Name.Name)
+
+	// 4. Add Signature: "(ctx context.Context) ([]GetJwksSetsRow, error)"
+	// We format x.Type (the FuncType) and strip the leading "func"
+	fullSig := nodeToSingleLineString(c.Fset, x.Type)
+	sig.WriteString(strings.TrimPrefix(fullSig, "func"))
+
+	c.FileNode.Funcs = append(c.FileNode.Funcs, sig.String())
+}
+
+func nodeToSingleLineString(fset *token.FileSet, node interface{}) string {
+	var buf bytes.Buffer
+	if err := format.Node(&buf, fset, node); err != nil {
+		return ""
+	}
+	// Efficiently collapse all whitespace/newlines into single spaces
+	return strings.Join(strings.Fields(buf.String()), " ")
 }
