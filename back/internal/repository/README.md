@@ -38,7 +38,7 @@ repository/
 │   ├── func (*Queries) ListUsers(ctx context.Context) ([]User, error)
 │   └── func (*Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 ├── db.go
-│   ├── type DBTX interface{}
+│   ├── type DBTX {Exec: (context.Context, string, ...interface{}) (pgconn.CommandTag, error), Query: (context.Context, string, ...interface{}) (pgx.Rows, error), QueryRow: (context.Context, string, ...interface{}) pgx.Row}
 │   ├── type Queries {db: DBTX}
 │   ├── func New(db DBTX) *Queries
 │   └── func (*Queries) WithTx(tx pgx.Tx) *Queries

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { checkout } from "$lib/auth-client";
     import { useUser } from "$lib/stores/user.svelte";
     import { onMount } from "svelte";
 
@@ -30,6 +29,7 @@
     }
 
     let products = $state<Product[]>([]);
+    let paymentProvider = $state<"none" | "polar">("none");
     let loading = $state(true);
     let checkoutLoading = $state<string | null>(null);
     let portalLoading = $state(false);
@@ -45,8 +45,9 @@
 
     async function fetchProducts(signal?: AbortSignal) {
         try {
-            const response = await fetch("/api/polar/products", { signal });
+            const response = await fetch("/api/payments/products", { signal });
             const data = await response.json();
+            paymentProvider = data.provider ?? "none";
             if (data.products) {
                 products = data.products;
             }
@@ -114,7 +115,15 @@
     async function handleCheckout(slug: string) {
         checkoutLoading = slug;
         try {
-            await checkout({ slug });
+            const response = await fetch("/api/payments/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ slug }),
+            });
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+            }
         } catch (e) {
             console.error("Checkout error:", e);
         } finally {
@@ -224,17 +233,23 @@
                 </div>
 
                 <div class="payment-info">
-                    <p class="payment-description">
-                        Update your payment method, view invoices, or cancel
-                        your subscription through the customer portal.
-                    </p>
-                    <a class="btn btn-secondary" href="/settings/portal">
-                        {#if portalLoading}
-                            <span class="spinner spinner-sm spinner-dark"
-                            ></span>
-                        {/if}
-                        Open Customer Portal
-                    </a>
+                    {#if paymentProvider === "polar"}
+                        <p class="payment-description">
+                            Update your payment method, view invoices, or cancel
+                            your subscription through the customer portal.
+                        </p>
+                        <a class="btn btn-secondary" href="/settings/portal">
+                            {#if portalLoading}
+                                <span class="spinner spinner-sm spinner-dark"
+                                ></span>
+                            {/if}
+                            Open Customer Portal
+                        </a>
+                    {:else}
+                        <p class="payment-description">
+                            No payment provider configured.
+                        </p>
+                    {/if}
                 </div>
             </section>
         </div>
@@ -343,10 +358,6 @@
         color: var(--color-warning);
     }
 
-    .plan-actions {
-        flex-shrink: 0;
-    }
-
     /* Badges */
     .badge {
         display: inline-block;
@@ -409,51 +420,6 @@
         background: var(--color-accent-faint);
     }
 
-    .plan-item-info {
-        flex: 1;
-    }
-
-    .plan-item-header {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .plan-item-header h4 {
-        font-size: var(--font-size-lg);
-        color: var(--color-text);
-        margin: 0;
-    }
-
-    .plan-item-price {
-        font-size: var(--font-size-base);
-        color: var(--color-text-secondary);
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .plan-item-features {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-sm);
-    }
-
-    .plan-item-features li {
-        font-size: var(--font-size-xs);
-        color: var(--color-text-muted);
-        background: var(--color-bg-tertiary);
-        padding: 0.25rem 0.5rem;
-        border-radius: var(--radius-sm);
-    }
-
-    .plan-item-action {
-        flex-shrink: 0;
-        margin-left: var(--spacing-lg);
-    }
-
     /* Payment Info */
     .payment-info {
         display: flex;
@@ -489,27 +455,10 @@
             flex-direction: column;
         }
 
-        .plan-actions {
-            width: 100%;
-        }
-
-        .plan-actions .btn {
-            width: 100%;
-        }
-
         .plan-item {
             flex-direction: column;
             align-items: flex-start;
             gap: var(--spacing-md);
-        }
-
-        .plan-item-action {
-            margin-left: 0;
-            width: 100%;
-        }
-
-        .plan-item-action .btn {
-            width: 100%;
         }
     }
 </style>

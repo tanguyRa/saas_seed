@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signUp } from '$lib/auth-client';
+	import { signIn, signUp } from '$lib/auth-client';
 	import { goto } from '$app/navigation';
 	import { t, tError } from '$lib/i18n/index.svelte';
 
@@ -24,6 +24,16 @@
 			if (result.error) {
 				error = tError(result.error.message, 'auth.register.errors.failed');
 			} else {
+				const signInResult = await signIn.email({
+					email,
+					password
+				});
+
+				if (signInResult.error) {
+					error = tError(signInResult.error.message, 'auth.login.errors.failed');
+					return;
+				}
+
 				goto('/app');
 			}
 		} catch (err) {

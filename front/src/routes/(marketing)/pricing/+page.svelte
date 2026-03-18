@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { checkout, useSession } from "$lib/auth-client";
+    import { useSession } from "$lib/auth-client";
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
@@ -56,7 +56,7 @@
 
     onMount(async () => {
         try {
-            const response = await fetch("/api/polar/products");
+            const response = await fetch("/api/payments/products");
             const data = await response.json();
             if (data.products?.length) {
                 products = data.products;
@@ -91,7 +91,21 @@
 
         checkoutLoading = slug;
         try {
-            await checkout({ slug });
+            const response = await fetch("/api/payments/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ slug })
+            });
+
+            if (!response.ok) {
+                console.error("Checkout failed", await response.text());
+                return;
+            }
+
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+            }
         } finally {
             checkoutLoading = null;
         }

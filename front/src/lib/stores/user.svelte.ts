@@ -117,6 +117,11 @@ function createUserStore() {
         subscriptionLoading = true;
         subscriptionError = null;
         try {
+            if (!customer || typeof customer.state !== "function") {
+                subscriptions = [];
+                subscriptionFetched = true;
+                return;
+            }
             const { data: customerState } = await customer.state();
             if (customerState) {
                 subscriptions = customerState.activeSubscriptions;

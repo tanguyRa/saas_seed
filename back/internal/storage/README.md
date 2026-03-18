@@ -11,5 +11,5 @@ storage/
 │   ├── func (*MinIOStore) ensureBucket(ctx context.Context) error
 │   └── func (*MinIOStore) ensurePublicPolicy(ctx context.Context) error
 └── storage.go
-    └── type ObjectStore interface{}
+    └── type ObjectStore {Put: (ctx context.Context, key string, contentType string, data []byte) (string, error), Get: (ctx context.Context, key string) ([]byte, error)}
 ```

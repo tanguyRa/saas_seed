@@ -7,10 +7,10 @@ llm/
 │   ├── type anthropicProvider {apiKey: string, model: string, client: *http.Client}
 │   ├── type anthropicMessage {Role: string, Content: string}
 │   ├── type anthropicRequest {Model: string, MaxTokens: int, System: string, Messages: []anthropicMessage, Stream: bool}
-│   ├── type anthropicResponse {Content: []struct{}, StopReason: string}
-│   ├── type anthropicStreamEvent {Type: string, Index: int, Delta: *struct{}}
+│   ├── type anthropicResponse {Content: []struct { Type string `json:"type"` Text string `json:"text"` }, StopReason: string}
+│   ├── type anthropicStreamEvent {Type: string, Index: int, Delta: *struct { Type string `json:"type"` Text string `json:"text"` }}
 │   ├── func getSharedHTTPClient() *http.Client
-│   ├── func newAnthropicProvider(apiKey string, model string) *anthropicProvider
+│   ├── func newAnthropicProvider(apiKey, model string) *anthropicProvider
 │   ├── func (*anthropicProvider) Name() string
 │   ├── func (*anthropicProvider) Chat(ctx context.Context, systemPrompt string, messages []Message) (string, error)
 │   └── func (*anthropicProvider) ChatStream(ctx context.Context, systemPrompt string, messages []Message) (<-chan StreamChunk, error)
@@ -32,16 +32,16 @@ llm/
 │   ├── type geminiRequest {SystemInstruction: *geminiContent, Contents: []geminiContent}
 │   ├── type geminiCandidate {Content: geminiContent}
 │   ├── type geminiResponse {Candidates: []geminiCandidate}
-│   ├── func newGeminiProvider(apiKey string, model string) *geminiProvider
+│   ├── func newGeminiProvider(apiKey, model string) *geminiProvider
 │   ├── func (*geminiProvider) Name() string
 │   ├── func (*geminiProvider) Chat(ctx context.Context, systemPrompt string, messages []Message) (string, error)
 │   └── func (*geminiProvider) ChatStream(ctx context.Context, systemPrompt string, messages []Message) (<-chan StreamChunk, error)
 ├── llm.go
 │   ├── type Message {Role: string, Content: string}
 │   ├── type StreamChunk {Content: string, Done: bool, Error: error}
-│   ├── type Provider interface{}
+│   ├── type Provider {Chat: (ctx context.Context, systemPrompt string, messages []Message) (string, error), ChatStream: (ctx context.Context, systemPrompt string, messages []Message) (<-chan StreamChunk, error), Name: () string}
 │   ├── type Config {APIKey: string, Model: string}
-│   └── func NewProvider(adapter string, apiKey string, model string) (Provider, error)
+│   └── func NewProvider(adapter, apiKey, model string) (Provider, error)
 ├── llm_test.go
 │   ├── func TestMockProvider_Name(t *testing.T)
 │   ├── func TestMockProvider_Chat(t *testing.T)

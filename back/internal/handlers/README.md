@@ -51,7 +51,7 @@ handlers/
 │   └── func TestPolarWebhook(t *testing.T)
 ├── response.go
 │   ├── func respondJSON(w http.ResponseWriter, status int, data any)
-│   └── func respondError(w http.ResponseWriter, status int, code string, message string)
+│   └── func respondError(w http.ResponseWriter, status int, code, message string)
 └── test_helpers_test.go
     ├── type mockQueue {entries: []queueEntry, err: error}
     ├── type queueEntry {jobType: string, payload: any}
@@ -64,9 +64,9 @@ handlers/
     ├── func withTx(t *testing.T, pool *pgxpool.Pool) (context.Context, repository.DBTX, *repository.Queries, func())
     ├── func createTestUser(t *testing.T, ctx context.Context, queries *repository.Queries) session.UserInfo
     ├── func withUserContext(ctx context.Context, user session.UserInfo, queries *repository.Queries) context.Context
-    ├── func doJSONRequest(t *testing.T, handler http.HandlerFunc, method string, path string, body any, ctx context.Context) *httptest.ResponseRecorder
+    ├── func doJSONRequest(t *testing.T, handler http.HandlerFunc, method, path string, body any, ctx context.Context) *httptest.ResponseRecorder
     ├── func makeLogger() *slog.Logger
     ├── func mustParseTime(t *testing.T, value string) time.Time
     ├── func mustParseUUID(t *testing.T, value string) uuid.UUID
-    └── func requireContains(t *testing.T, haystack string, needle string)
+    └── func requireContains(t *testing.T, haystack, needle string)
 ```

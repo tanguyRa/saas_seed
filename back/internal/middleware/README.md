@@ -4,7 +4,7 @@
 middleware/
 ├── README.md
 ├── chain.go
-│   ├── type Constructor func()
+│   ├── type Constructor func(http.Handler) http.Handler
 │   ├── type Chain {constructors: []Constructor}
 │   ├── func New(constructors ...Constructor) Chain
 │   ├── func (Chain) Then(h http.Handler) http.Handler
@@ -13,7 +13,7 @@ middleware/
 │   └── func (Chain) Extend(chain Chain) Chain
 ├── chain_test.go
 │   ├── func tagMiddleware(tag string) Constructor
-│   ├── func funcsEqual(f1 interface{}, f2 interface{}) bool
+│   ├── func funcsEqual(f1, f2 interface{}) bool
 │   ├── func TestNew(t *testing.T)
 │   ├── func TestThenWorksWithNoMiddleware(t *testing.T)
 │   ├── func TestThenTreatsNilAsDefaultServeMux(t *testing.T)
@@ -31,7 +31,7 @@ middleware/
 ├── ratelimit.go
 │   ├── type RateLimiter {mu: sync.RWMutex, buckets: map[string]*tokenBucket, rate: int, interval: time.Duration, burst: int, stopCh: chan struct{}}
 │   ├── type tokenBucket {tokens: int, lastRefill: time.Time}
-│   ├── type UserKeyExtractor func()
+│   ├── type UserKeyExtractor func(r *http.Request) string
 │   ├── func NewRateLimiter(rate int, interval time.Duration, burst int) *RateLimiter
 │   ├── func (*RateLimiter) Stop()
 │   ├── func (*RateLimiter) Allow(key string) bool

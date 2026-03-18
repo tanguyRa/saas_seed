@@ -27,14 +27,6 @@
 {/if}
 
 <style>
-    .full-width {
-        width: 100%;
-    }
-
-    .avatar {
-        margin: 0 auto var(--spacing-lg);
-    }
-
     .auth-language {
         position: absolute;
         top: var(--spacing-md);

@@ -56,7 +56,7 @@ CREATE TABLE "verification" (
 
 CREATE TABLE "jwks" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-    "userId" UUID NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
+    "userId" UUID REFERENCES "user" (id) ON DELETE CASCADE,
     "publicKey" TEXT NOT NULL,
     "privateKey" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,11 +1,11 @@
 import { createAuthClient } from "better-auth/svelte"
 import { polarClient } from "@polar-sh/better-auth";
 
+const paymentProvider = ((import.meta.env.PUBLIC_PAYMENT_PROVIDER as string | undefined) || "").trim().toLowerCase();
+const plugins = paymentProvider === "polar" ? [polarClient()] : [];
+
 export const authClient = createAuthClient({
-    //you can pass client configuration here
-    plugins: [
-        polarClient()
-    ]
+    plugins
 })
 
 
