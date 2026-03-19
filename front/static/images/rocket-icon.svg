@@ -1,8 +1,0 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M24 2L32 18L24 22L16 18L24 2z" stroke="currentColor" stroke-width="2" fill="none"/>
-  <path d="M24 22v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-  <path d="M16 18L8 32L16 36L24 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M32 18L40 32L32 36L24 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="24" cy="12" r="2" fill="currentColor"/>
-  <path d="M20 42h8v4h-8z" fill="currentColor"/>
-</svg>
