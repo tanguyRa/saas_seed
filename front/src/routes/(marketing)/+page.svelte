@@ -7,57 +7,57 @@
 </script>
 
 <div class="landing">
-    <header class="topbar">
+    <header class="topbar row">
         <a class="brand" href="/">SaaS Seed</a>
-        <nav>
+        <nav class="row muted">
             <a href="#features">{t("landing.nav.features")}</a>
             <a href="/pricing">{t("landing.nav.pricing")}</a>
         </nav>
-        <div class="actions">
+        <div class="actions row">
             <LanguageSwitcher />
             {#if $session.data?.user}
                 <a class="btn btn-ghost" href="/app">{t("landing.nav.openApp")}</a>
             {:else}
                 <a class="btn btn-ghost" href="/login">{t("landing.nav.signIn")}</a>
             {/if}
-            <a class="btn btn-primary" href="/register">{t("landing.nav.getStarted")}</a>
+            <a class="btn primary" href="/register">{t("landing.nav.getStarted")}</a>
         </div>
     </header>
 
-    <main>
+    <article class="landing-main">
         <section class="hero">
-            <p class="eyebrow">{t("landing.hero.eyebrow")}</p>
+            <p class="eyebrow primary">{t("landing.hero.eyebrow")}</p>
             <h1>{t("landing.hero.title")}</h1>
-            <p>{t("landing.hero.subtitle")}</p>
-            <div class="hero-actions">
-                <a class="btn btn-primary" href="/register">{t("landing.hero.primaryCta")}</a>
-                <a class="btn btn-secondary" href="/pricing">{t("landing.hero.secondaryCta")}</a>
+            <p class="muted">{t("landing.hero.subtitle")}</p>
+            <div class="hero-actions row">
+                <a class="btn primary" href="/register">{t("landing.hero.primaryCta")}</a>
+                <a class="btn secondary" href="/pricing">{t("landing.hero.secondaryCta")}</a>
             </div>
         </section>
 
-        <section id="features" class="features">
+        <section id="features" class="features column">
             <h2>{t("landing.features.title")}</h2>
-            <p>{t("landing.features.subtitle")}</p>
+            <p class="muted">{t("landing.features.subtitle")}</p>
             <div class="cards">
-                <article class="card">
+                <article class="card feature-card">
                     <h3>{t("landing.features.cards.i18n.title")}</h3>
-                    <p>{t("landing.features.cards.i18n.body")}</p>
+                    <p class="muted">{t("landing.features.cards.i18n.body")}</p>
                 </article>
-                <article class="card">
+                <article class="card feature-card">
                     <h3>{t("landing.features.cards.auth.title")}</h3>
-                    <p>{t("landing.features.cards.auth.body")}</p>
+                    <p class="muted">{t("landing.features.cards.auth.body")}</p>
                 </article>
-                <article class="card">
+                <article class="card feature-card">
                     <h3>{t("landing.features.cards.billing.title")}</h3>
-                    <p>{t("landing.features.cards.billing.body")}</p>
+                    <p class="muted">{t("landing.features.cards.billing.body")}</p>
                 </article>
             </div>
         </section>
-    </main>
+    </article>
 
-    <footer class="footer">
+    <footer class="footer row muted">
         <span>{t("landing.footer.text")}</span>
-        <div>
+        <div class="row">
             <a href="/pricing">{t("landing.footer.pricing")}</a>
             <a href="/login">{t("landing.footer.login")}</a>
             <a href="/register">{t("landing.footer.register")}</a>
@@ -68,138 +68,74 @@
 <style>
     .landing {
         min-height: 100vh;
-        background: var(--color-bg);
-        color: var(--color-text);
         display: grid;
         grid-template-rows: auto 1fr auto;
     }
 
     .topbar {
-        max-width: var(--container-lg);
+        max-width: var(--container-xl);
         margin: 0 auto;
-        width: 100%;
-        padding: var(--space-5) var(--space-6);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--space-4);
+        padding: var(--xl);
         flex-wrap: wrap;
     }
 
     .brand {
         font-weight: 700;
-        font-size: var(--font-size-lg);
+        font-size: var(--xl);
     }
 
-    nav {
-        display: flex;
-        gap: var(--space-4);
-        color: var(--color-text-muted);
-    }
-
-    .actions {
-        display: flex;
-        gap: var(--space-2);
-        align-items: center;
-    }
-
-    main {
-        max-width: var(--container-lg);
+    .landing-main {
         margin: 0 auto;
-        width: 100%;
-        padding: var(--space-7) var(--space-6);
-        display: grid;
-        gap: var(--space-8);
+        width: min(100%, var(--container-xl));
+        gap: var(--xxxl);
     }
 
     .hero {
-        max-width: 760px;
+        max-width: 56ch;
     }
 
     .eyebrow {
-        color: var(--color-primary);
-        font-weight: 600;
-        margin-bottom: var(--space-2);
+        display: inline-flex;
+        font-weight: 700;
+        border-radius: var(--sm);
+        padding: 0.2rem 0.75rem;
+        width: fit-content;
     }
 
     h1 {
-        font-size: clamp(2rem, 6vw, 3.5rem);
-        line-height: 1.1;
-        margin-bottom: var(--space-4);
-    }
-
-    .hero p {
-        color: var(--color-text-muted);
-        max-width: 60ch;
+        font-size: clamp(2.2rem, 6vw, 4rem);
     }
 
     .hero-actions {
-        display: flex;
-        gap: var(--space-3);
-        margin-top: var(--space-5);
         flex-wrap: wrap;
-    }
-
-    .features h2 {
-        margin-bottom: var(--space-2);
-    }
-
-    .features > p {
-        color: var(--color-text-muted);
-        margin-bottom: var(--space-5);
+        justify-content: flex-start;
     }
 
     .cards {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: var(--space-4);
+        gap: var(--lg);
     }
 
-    .card {
-        padding: var(--space-5);
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-    }
-
-    .card h3 {
-        margin-bottom: var(--space-2);
-    }
-
-    .card p {
-        color: var(--color-text-muted);
+    .feature-card {
+        gap: var(--md);
     }
 
     .footer {
-        max-width: var(--container-lg);
+        max-width: var(--container-xl);
         margin: 0 auto;
-        width: 100%;
-        padding: var(--space-5) var(--space-6);
-        border-top: 1px solid var(--color-border);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: var(--space-4);
+        padding: var(--xl);
         flex-wrap: wrap;
-        color: var(--color-text-muted);
-    }
-
-    .footer div {
-        display: flex;
-        gap: var(--space-4);
     }
 
     @media (max-width: 768px) {
-        .topbar {
-            justify-content: center;
-        }
-
-        .actions {
-            width: 100%;
-            justify-content: center;
-        }
-
+        .topbar,
         .footer {
+            justify-content: center;
+        }
+
+        .topbar .actions {
+            width: 100%;
             justify-content: center;
         }
     }

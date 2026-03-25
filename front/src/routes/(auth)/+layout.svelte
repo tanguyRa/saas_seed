@@ -17,19 +17,35 @@
 
 {#if !$session.data}
     <div class="auth-container">
-        <div class="auth-language">
-            <LanguageSwitcher />
-        </div>
-        <div class="auth-card">
+        <article class="card auth">
+            <div class="auth-language">
+                <LanguageSwitcher />
+            </div>
             {@render children()}
-        </div>
+        </article>
     </div>
 {/if}
 
 <style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6) var(--space-4);
+        background: radial-gradient(
+            circle at top,
+            #fff3ed 0%,
+            #f8f7f4 55%,
+            #ffffff 100%
+        );
+    }
     .auth-language {
-        position: absolute;
-        top: var(--spacing-md);
-        right: var(--spacing-md);
+        align-self: flex-end;
+    }
+
+    .auth {
+        width: min(420px, 100%);
+        gap: 0;
     }
 </style>

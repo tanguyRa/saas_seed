@@ -137,309 +137,203 @@
     }
 </script>
 
-<div class="settings-page">
-    <header class="settings-header">
+<article>
+    <header>
         <h1>Profile Settings</h1>
         <p>Manage your account information</p>
     </header>
 
     {#if user.state.user}
-        <div class="settings-sections">
-            <!-- Profile Section -->
-            <section class="settings-section">
-                <div class="section-header">
-                    <h2>Profile Information</h2>
-                    <p>Update your personal details</p>
+        <!-- Profile Section -->
+        <section>
+            <header>
+                <h2>Profile Information</h2>
+                <p>Update your personal details</p>
+            </header>
+
+            <form
+                onsubmit={(e) => {
+                    e.preventDefault();
+                    handleUpdateProfile();
+                }}
+            >
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        bind:value={name}
+                        placeholder="Your name"
+                        autocomplete="name"
+                        required
+                    />
                 </div>
 
-                <form
-                    class="settings-form"
-                    onsubmit={(e) => {
-                        e.preventDefault();
-                        handleUpdateProfile();
-                    }}
-                >
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            bind:value={name}
-                            placeholder="Your name"
-                            autocomplete="name"
-                            required
-                        />
-                    </div>
-
-                    {#if profileMessage}
-                        <div
-                            class="message"
-                            class:success={profileMessage.type === "success"}
-                            class:error={profileMessage.type === "error"}
-                        >
-                            {profileMessage.text}
-                        </div>
-                    {/if}
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        disabled={profileLoading}
+                {#if profileMessage}
+                    <div
+                        class="message"
+                        class:success={profileMessage.type === "success"}
+                        class:error={profileMessage.type === "error"}
                     >
-                        {#if profileLoading}
-                            <span class="spinner spinner-sm"></span>
-                        {/if}
-                        Save Changes
-                    </button>
-                </form>
-            </section>
+                        {profileMessage.text}
+                    </div>
+                {/if}
 
-            <!-- Email Section -->
-            <section class="settings-section">
-                <div class="section-header">
-                    <h2>Email Address</h2>
-                    <p>Change your email address</p>
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    disabled={profileLoading}
+                >
+                    {#if profileLoading}
+                        <span class="spinner spinner-sm"></span>
+                    {/if}
+                    Save Changes
+                </button>
+            </form>
+        </section>
+
+        <!-- Email Section -->
+        <section>
+            <header>
+                <h2>Email Address</h2>
+                <p>Change your email address</p>
+            </header>
+
+            <form
+                onsubmit={(e) => {
+                    e.preventDefault();
+                    handleUpdateEmail();
+                }}
+            >
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        bind:value={email}
+                        placeholder="your@email.com"
+                        autocomplete="email"
+                        required
+                    />
+                    <span class="form-hint"
+                        >A verification email will be sent to confirm the change</span
+                    >
                 </div>
 
-                <form
-                    class="settings-form"
-                    onsubmit={(e) => {
-                        e.preventDefault();
-                        handleUpdateEmail();
-                    }}
-                >
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            bind:value={email}
-                            placeholder="your@email.com"
-                            autocomplete="email"
-                            required
-                        />
-                        <span class="form-hint"
-                            >A verification email will be sent to confirm the
-                            change</span
-                        >
-                    </div>
-
-                    {#if emailMessage}
-                        <div
-                            class="message"
-                            class:success={emailMessage.type === "success"}
-                            class:error={emailMessage.type === "error"}
-                        >
-                            {emailMessage.text}
-                        </div>
-                    {/if}
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        disabled={emailLoading ||
-                            email === user.state.user?.email}
+                {#if emailMessage}
+                    <div
+                        class="message"
+                        class:success={emailMessage.type === "success"}
+                        class:error={emailMessage.type === "error"}
                     >
-                        {#if emailLoading}
-                            <span class="spinner spinner-sm"></span>
-                        {/if}
-                        Update Email
-                    </button>
-                </form>
-            </section>
+                        {emailMessage.text}
+                    </div>
+                {/if}
 
-            <!-- Password Section -->
-            <section class="settings-section">
-                <div class="section-header">
-                    <h2>Password</h2>
-                    <p>Change your password</p>
+                <button
+                    type="submit"
+                    class="btn-primary"
+                    disabled={emailLoading || email === user.state.user?.email}
+                >
+                    {#if emailLoading}
+                        <span class="spinner spinner-sm"></span>
+                    {/if}
+                    Update Email
+                </button>
+            </form>
+        </section>
+
+        <!-- Password Section -->
+        <section>
+            <header>
+                <h2>Password</h2>
+                <p>Change your password</p>
+            </header>
+
+            <form
+                onsubmit={(e) => {
+                    e.preventDefault();
+                    handleUpdatePassword();
+                }}
+            >
+                <!-- Hidden field for password manager autocomplete -->
+                <div style="display:none;">
+                    <label for="password-form-name">Name</label>
+                    <input
+                        type="text"
+                        id="password-form-name"
+                        value={name}
+                        placeholder="Your name"
+                        autocomplete="name"
+                        readonly
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="current-password">Current Password</label>
+                    <input
+                        type="password"
+                        id="current-password"
+                        bind:value={currentPassword}
+                        placeholder="Enter current password"
+                        autocomplete="current-password"
+                        required
+                    />
                 </div>
 
-                <form
-                    class="settings-form"
-                    onsubmit={(e) => {
-                        e.preventDefault();
-                        handleUpdatePassword();
-                    }}
-                >
-                    <!-- Hidden field for password manager autocomplete -->
-                    <div style="display:none;">
-                        <label for="password-form-name">Name</label>
-                        <input
-                            type="text"
-                            id="password-form-name"
-                            value={name}
-                            placeholder="Your name"
-                            autocomplete="name"
-                            readonly
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label for="current-password">Current Password</label>
-                        <input
-                            type="password"
-                            id="current-password"
-                            bind:value={currentPassword}
-                            placeholder="Enter current password"
-                            autocomplete="current-password"
-                            required
-                        />
-                    </div>
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input
+                        type="password"
+                        id="new-password"
+                        bind:value={newPassword}
+                        placeholder="Enter new password"
+                        autocomplete="new-password"
+                        required
+                        minlength="8"
+                    />
+                    <span class="form-hint">Minimum 8 characters</span>
+                </div>
 
-                    <div class="form-group">
-                        <label for="new-password">New Password</label>
-                        <input
-                            type="password"
-                            id="new-password"
-                            bind:value={newPassword}
-                            placeholder="Enter new password"
-                            autocomplete="new-password"
-                            required
-                            minlength="8"
-                        />
-                        <span class="form-hint">Minimum 8 characters</span>
-                    </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm New Password</label>
+                    <input
+                        type="password"
+                        id="confirm-password"
+                        bind:value={confirmPassword}
+                        placeholder="Confirm new password"
+                        autocomplete="new-password"
+                        required
+                    />
+                </div>
 
-                    <div class="form-group">
-                        <label for="confirm-password"
-                            >Confirm New Password</label
-                        >
-                        <input
-                            type="password"
-                            id="confirm-password"
-                            bind:value={confirmPassword}
-                            placeholder="Confirm new password"
-                            autocomplete="new-password"
-                            required
-                        />
-                    </div>
-
-                    {#if passwordMessage}
-                        <div
-                            class="message"
-                            class:success={passwordMessage.type === "success"}
-                            class:error={passwordMessage.type === "error"}
-                        >
-                            {passwordMessage.text}
-                        </div>
-                    {/if}
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        disabled={passwordLoading ||
-                            !currentPassword ||
-                            !newPassword ||
-                            !confirmPassword}
+                {#if passwordMessage}
+                    <div
+                        class="message"
+                        class:success={passwordMessage.type === "success"}
+                        class:error={passwordMessage.type === "error"}
                     >
-                        {#if passwordLoading}
-                            <span class="spinner spinner-sm"></span>
-                        {/if}
-                        Change Password
-                    </button>
-                </form>
-            </section>
-        </div>
+                        {passwordMessage.text}
+                    </div>
+                {/if}
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                    disabled={passwordLoading ||
+                        !currentPassword ||
+                        !newPassword ||
+                        !confirmPassword}
+                >
+                    {#if passwordLoading}
+                        <span class="spinner spinner-sm"></span>
+                    {/if}
+                    Change Password
+                </button>
+            </form>
+        </section>
     {:else}
         <div class="loading-state">
             <div class="spinner spinner-dark"></div>
         </div>
     {/if}
-</div>
-
-<style>
-    .settings-page {
-        padding: var(--spacing-xl);
-        max-width: 800px;
-    }
-
-    .settings-header {
-        margin-bottom: var(--spacing-2xl);
-    }
-
-    .settings-header h1 {
-        font-size: var(--font-size-3xl);
-        color: var(--color-text);
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .settings-header p {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-lg);
-    }
-
-    .settings-sections {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xl);
-    }
-
-    .settings-section {
-        background: var(--color-bg);
-        border-radius: var(--radius-lg);
-        padding: var(--spacing-xl);
-        box-shadow: var(--shadow-sm);
-    }
-
-    .section-header {
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-md);
-        border-bottom: 1px solid var(--color-border);
-    }
-
-    .section-header h2 {
-        font-size: var(--font-size-xl);
-        color: var(--color-text);
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .section-header p {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-sm);
-    }
-
-    .settings-form {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
-    }
-
-    .settings-form .btn {
-        align-self: flex-start;
-        margin-top: var(--spacing-sm);
-    }
-
-    .message {
-        padding: var(--spacing-sm) var(--spacing-md);
-        border-radius: var(--radius-md);
-        font-size: var(--font-size-sm);
-    }
-
-    .message.success {
-        background: var(--color-success-bg);
-        color: var(--color-success);
-        border: 1px solid var(--color-success-border);
-    }
-
-    .message.error {
-        background: var(--color-error-bg);
-        color: var(--color-error);
-        border: 1px solid var(--color-error-border);
-    }
-
-    .loading-state {
-        display: flex;
-        justify-content: center;
-        padding: var(--spacing-3xl);
-    }
-
-    @media (max-width: 768px) {
-        .settings-page {
-            padding: var(--spacing-md);
-        }
-
-        .settings-section {
-            padding: var(--spacing-lg);
-        }
-    }
-</style>
+</article>

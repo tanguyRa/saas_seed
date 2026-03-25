@@ -66,11 +66,6 @@
         return products.find((p) => p.id === subscription.productId) || null;
     }
 
-    function isCurrentPlan(product: Product): boolean {
-        const subscription = user.state.activeSubscription;
-        return subscription?.productId === product.id;
-    }
-
     function formatPrice(product: Product): string {
         const price = product.prices[0];
         if (!price || price.priceAmount === null || price.priceAmount === 0) {
@@ -102,56 +97,19 @@
     function getStatusBadgeClass(status: string): string {
         switch (status) {
             case "active":
-                return "badge-success";
+                return "success";
             case "past_due":
-                return "badge-warning";
+                return "warning";
             case "canceled":
-                return "badge-error";
+                return "error";
             default:
-                return "badge-neutral";
-        }
-    }
-
-    async function handleCheckout(slug: string) {
-        checkoutLoading = slug;
-        try {
-            const response = await fetch("/api/payments/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ slug }),
-            });
-            const data = await response.json();
-            if (data.url) {
-                window.location.href = data.url;
-            }
-        } catch (e) {
-            console.error("Checkout error:", e);
-        } finally {
-            checkoutLoading = null;
-        }
-    }
-
-    async function handleOpenPortal() {
-        portalLoading = true;
-        try {
-            const response = await fetch("/api/auth/portal", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-            });
-            const data = await response.json();
-            if (data.url) {
-                window.location.href = data.url;
-            }
-        } catch (e) {
-            console.error("Portal error:", e);
-        } finally {
-            portalLoading = false;
+                return "neutral";
         }
     }
 </script>
 
-<div class="settings-page">
-    <header class="settings-header">
+<article>
+    <header>
         <h1>Billing & Subscription</h1>
         <p>Manage your subscription and billing information</p>
     </header>
@@ -164,73 +122,73 @@
         {@const subscription = user.state.activeSubscription}
         {@const currentProduct = getCurrentProduct()}
 
-        <div class="settings-sections">
-            <!-- Current Plan Section -->
-            <section class="settings-section">
-                <div class="section-header">
-                    <h2>Current Plan</h2>
-                    <p>Your active subscription</p>
-                </div>
+        <!-- Current Plan Section -->
+        <section>
+            <header>
+                <h2>Current Plan</h2>
+                <p>Your active subscription</p>
+            </header>
 
-                {#if subscription && currentProduct}
-                    <div class="current-plan">
-                        <div class="plan-info">
-                            <div class="plan-name-row">
-                                <h3>{currentProduct.name}</h3>
-                                <span
-                                    class="badge {getStatusBadgeClass(
-                                        subscription.status,
-                                    )}"
-                                >
-                                    {subscription.status === "active"
-                                        ? "Active"
-                                        : subscription.status}
-                                </span>
-                            </div>
-                            <p class="plan-price-info">
-                                {formatPrice(currentProduct)}{getBillingCycle(
-                                    currentProduct,
-                                )}
-                            </p>
-                            {#if subscription.currentPeriodEnd}
-                                <p class="plan-renewal">
-                                    {#if subscription.cancelAtPeriodEnd}
-                                        <span class="cancellation-notice">
-                                            Cancels on {formatDate(
-                                                subscription.currentPeriodEnd,
-                                            )}
-                                        </span>
-                                    {:else}
-                                        Renews on {formatDate(
+            {#if subscription && currentProduct}
+                <div class="current-plan">
+                    <div class="plan-info">
+                        <div class="plan-name-row">
+                            <h3>{currentProduct.name}</h3>
+                            <span
+                                class="badge {getStatusBadgeClass(
+                                    subscription.status,
+                                )}"
+                            >
+                                {subscription.status === "active"
+                                    ? "Active"
+                                    : subscription.status}
+                            </span>
+                        </div>
+                        <p class="plan-price-info">
+                            {formatPrice(currentProduct)}{getBillingCycle(
+                                currentProduct,
+                            )}
+                        </p>
+                        {#if subscription.currentPeriodEnd}
+                            <p class="plan-renewal">
+                                {#if subscription.cancelAtPeriodEnd}
+                                    <span class="cancellation-notice">
+                                        Cancels on {formatDate(
                                             subscription.currentPeriodEnd,
                                         )}
-                                    {/if}
-                                </p>
-                            {/if}
-                        </div>
-                    </div>
-                {:else}
-                    <div class="current-plan free-plan">
-                        <div class="plan-info">
-                            <div class="plan-name-row">
-                                <h3>Free Plan</h3>
-                                <span class="badge badge-neutral">Active</span>
-                            </div>
-                            <p class="plan-price-info">$0/month</p>
-                            <p class="plan-description">
-                                Basic features with limited access
+                                    </span>
+                                {:else}
+                                    Renews on {formatDate(
+                                        subscription.currentPeriodEnd,
+                                    )}
+                                {/if}
                             </p>
-                        </div>
+                        {/if}
                     </div>
-                {/if}
-            </section>
+                </div>
+            {:else}
+                <div class="current-plan free-plan">
+                    <div class="plan-info">
+                        <div class="plan-name-row">
+                            <h3>Free Plan</h3>
+                            <span class="badge badge-neutral">Active</span>
+                        </div>
+                        <p class="plan-price-info">$0/month</p>
+                        <p class="plan-description">
+                            Basic features with limited access
+                        </p>
+                    </div>
+                </div>
+            {/if}
+        </section>
 
+        {#if subscription && currentProduct}
             <!-- Payment Method Section -->
-            <section class="settings-section">
-                <div class="section-header">
+            <section>
+                <header>
                     <h2>Payment Method</h2>
                     <p>Manage your payment information</p>
-                </div>
+                </header>
 
                 <div class="payment-info">
                     {#if paymentProvider === "polar"}
@@ -252,68 +210,11 @@
                     {/if}
                 </div>
             </section>
-        </div>
+        {/if}
     {/if}
-</div>
+</article>
 
 <style>
-    .settings-page {
-        padding: var(--spacing-xl);
-        max-width: 800px;
-    }
-
-    .settings-header {
-        margin-bottom: var(--spacing-2xl);
-    }
-
-    .settings-header h1 {
-        font-size: var(--font-size-3xl);
-        color: var(--color-text);
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .settings-header p {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-lg);
-    }
-
-    .settings-sections {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xl);
-    }
-
-    .settings-section {
-        background: var(--color-bg);
-        border-radius: var(--radius-lg);
-        padding: var(--spacing-xl);
-        box-shadow: var(--shadow-sm);
-    }
-
-    .section-header {
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-md);
-        border-bottom: 1px solid var(--color-border);
-    }
-
-    .section-header h2 {
-        font-size: var(--font-size-xl);
-        color: var(--color-text);
-        margin-bottom: var(--spacing-xs);
-    }
-
-    .section-header p {
-        color: var(--color-text-muted);
-        font-size: var(--font-size-sm);
-    }
-
-    .loading-state {
-        display: flex;
-        justify-content: center;
-        padding: var(--spacing-3xl);
-    }
-
-    /* Current Plan */
     .current-plan {
         display: flex;
         justify-content: space-between;
@@ -358,69 +259,6 @@
         color: var(--color-warning);
     }
 
-    /* Badges */
-    .badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: var(--radius-full);
-        font-size: var(--font-size-xs);
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .badge-success {
-        background: var(--color-success-bg);
-        color: var(--color-success);
-    }
-
-    .badge-warning {
-        background: var(--color-warning-bg);
-        color: var(--color-warning);
-    }
-
-    .badge-error {
-        background: var(--color-error-bg);
-        color: var(--color-error);
-    }
-
-    .badge-neutral {
-        background: var(--color-bg-tertiary);
-        color: var(--color-text-muted);
-    }
-
-    .badge-primary {
-        background: var(--color-accent-soft);
-        color: var(--color-primary);
-    }
-
-    /* Plans List */
-    .plans-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
-    }
-
-    .plan-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: var(--spacing-lg);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-md);
-        transition: border-color var(--transition-fast);
-    }
-
-    .plan-item:hover {
-        border-color: var(--color-primary);
-    }
-
-    .plan-item.current {
-        border-color: var(--color-primary);
-        background: var(--color-accent-faint);
-    }
-
-    /* Payment Info */
     .payment-info {
         display: flex;
         flex-direction: column;
@@ -436,29 +274,9 @@
         align-self: flex-start;
     }
 
-    .empty-state {
-        color: var(--color-text-muted);
-        text-align: center;
-        padding: var(--spacing-lg);
-    }
-
     @media (max-width: 768px) {
-        .settings-page {
-            padding: var(--spacing-md);
-        }
-
-        .settings-section {
-            padding: var(--spacing-lg);
-        }
-
         .current-plan {
             flex-direction: column;
-        }
-
-        .plan-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: var(--spacing-md);
         }
     }
 </style>

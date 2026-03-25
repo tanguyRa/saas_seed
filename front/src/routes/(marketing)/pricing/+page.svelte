@@ -128,7 +128,10 @@
             {@const plans = products.length ? products : demoPlans}
             <div class="plans">
                 {#each plans as product}
-                    <article class="plan" class:highlighted={product.isHighlighted}>
+                    <article
+                        class="plan card"
+                        class:highlighted={product.isHighlighted}
+                    >
                         <h2>{product.name}</h2>
                         <p class="muted">{product.description}</p>
 
@@ -187,10 +190,6 @@
         margin-bottom: var(--space-2);
     }
 
-    .muted {
-        color: var(--color-text-muted);
-    }
-
     .plans {
         margin-top: var(--space-6);
         display: grid;
@@ -199,9 +198,6 @@
     }
 
     .plan {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
         padding: var(--space-5);
         display: grid;
         gap: var(--space-3);

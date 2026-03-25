@@ -14,9 +14,13 @@
                 {user.state.user?.name || t("dashboard.header.userFallback")}
             </h1>
             {#if !isPremium}
-                <span class="tier-badge free">{t("dashboard.header.freePlan")}</span>
+                <span class="badge tier-badge free"
+                    >{t("dashboard.header.freePlan")}</span
+                >
             {:else}
-                <span class="tier-badge premium">{t("dashboard.header.premiumPlan")}</span>
+                <span class="badge tier-badge premium"
+                    >{t("dashboard.header.premiumPlan")}</span
+                >
             {/if}
         </div>
     </header>
@@ -48,10 +52,6 @@
     }
 
     .tier-badge {
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius-full);
-        font-size: var(--font-size-xs);
-        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }

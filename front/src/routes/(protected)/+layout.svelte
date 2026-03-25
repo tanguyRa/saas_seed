@@ -1,10 +1,10 @@
 <script lang="ts">
     import type { LayoutProps } from "./$types";
     import { signOut } from "$lib/auth-client";
-    import LanguageSwitcher from "$lib/components/LanguageSwitcher.svelte";
     import { t } from "$lib/i18n/index.svelte";
     import { useUser, resetUserStore } from "$lib/stores/user.svelte";
     import { goto } from "$app/navigation";
+    import { page } from "$app/stores";
 
     let { children }: LayoutProps = $props();
 
@@ -47,6 +47,11 @@
             resetUserStore();
             goto("/");
         }
+    }
+
+    function isCurrentPath(path: string) {
+        const pathname = $page.url.pathname;
+        return pathname === path || pathname.startsWith(`${path}/`);
     }
 </script>
 
@@ -94,13 +99,18 @@
                 <div class="nav-section"></div>
 
                 <div class="nav-section nav-section-bottom">
-                    <div class="sidebar-language">
-                        <LanguageSwitcher />
-                    </div>
                     <span class="nav-section-label"
-                        >{sidebarCollapsed ? "" : t("protected.sidebar.settings")}</span
+                        >{sidebarCollapsed
+                            ? ""
+                            : t("protected.sidebar.settings")}</span
                     >
-                    <a href="/settings/profile" class="nav-link">
+                    <a
+                        href="/settings/profile"
+                        class="nav-link"
+                        aria-current={isCurrentPath("/settings/profile")
+                            ? "page"
+                            : undefined}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -120,7 +130,13 @@
                             <span>{t("protected.sidebar.profile")}</span>
                         {/if}
                     </a>
-                    <a href="/settings/billing" class="nav-link">
+                    <a
+                        href="/settings/billing"
+                        class="nav-link"
+                        aria-current={isCurrentPath("/settings/billing")
+                            ? "page"
+                            : undefined}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -146,7 +162,13 @@
                             <span>{t("protected.sidebar.billing")}</span>
                         {/if}
                     </a>
-                    <a href="/settings/api-keys" class="nav-link">
+                    <a
+                        href="/settings/api-keys"
+                        class="nav-link"
+                        aria-current={isCurrentPath("/settings/api-keys")
+                            ? "page"
+                            : undefined}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="20"
@@ -166,7 +188,8 @@
                             <span>{t("protected.sidebar.apiKeys")}</span>
                         {/if}
                     </a>
-                    <button
+                    <a
+                        href="#"
                         class="nav-link logout-btn"
                         onclick={handleLogout}
                         aria-label={t("protected.sidebar.logout")}
@@ -190,7 +213,7 @@
                         {#if !sidebarCollapsed}
                             <span>{t("protected.sidebar.logout")}</span>
                         {/if}
-                    </button>
+                    </a>
                 </div>
             </nav>
         </aside>
@@ -208,7 +231,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--color-bg-secondary);
+        background: var(--color-surface-alt);
     }
 
     /* App Layout */
@@ -221,11 +244,11 @@
     .sidebar {
         width: 240px;
         height: 100%;
-        background: var(--color-sand);
-        border-right: 1px solid var(--color-border-light);
+        background: var(--color-bg);
+        border-right: 1px solid var(--color-border);
         display: flex;
         flex-direction: column;
-        transition: width var(--transition-slow);
+        transition: width 0.3s ease;
     }
 
     .app-layout.collapsed .sidebar {
@@ -236,8 +259,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--color-border-light);
+        padding: var(--lg);
+        border-bottom: 1px solid var(--color-border);
     }
 
     .sidebar-header .logo {
@@ -245,14 +268,14 @@
         align-items: center;
         gap: 0.75rem;
         text-decoration: none;
-        color: var(--color-ink);
+        color: var(--color-text);
         overflow: hidden;
     }
 
     .sidebar-header .logo-mark {
         width: 26px;
         height: 26px;
-        background: var(--color-ink);
+        background: var(--color-text);
         clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
         position: relative;
         flex-shrink: 0;
@@ -281,8 +304,8 @@
         padding: var(--spacing-sm);
         border-radius: var(--radius-sm);
         cursor: pointer;
-        color: var(--color-ink-soft);
-        transition: all var(--transition-fast);
+        color: var(--color-text-muted);
+        transition: all 0.1s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -290,8 +313,8 @@
     }
 
     .toggle-btn:hover {
-        background: var(--color-border-light);
-        color: var(--color-ink);
+        background: var(--color-border);
+        color: var(--color-text);
     }
 
     .app-layout.collapsed .toggle-btn {
@@ -301,7 +324,7 @@
 
     .app-layout.collapsed .sidebar-header {
         flex-direction: column;
-        gap: var(--spacing-sm);
+        gap: var(--sm);
     }
 
     /* Sidebar Navigation */
@@ -309,49 +332,49 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: var(--spacing-md);
+        padding: var(--md);
         overflow-y: auto;
     }
 
     .nav-section {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-xs);
+        gap: var(--xs);
     }
 
     .nav-section-bottom {
         margin-top: auto;
-        border-top: 1px solid var(--color-border-light);
-        padding-top: var(--spacing-md);
+        border-top: 1px solid var(--color-border);
+        padding-top: var(--md);
     }
 
     .sidebar-language {
         display: flex;
         justify-content: flex-start;
-        padding: 0 var(--spacing-sm);
-        margin-bottom: var(--spacing-sm);
+        padding: 0 var(--sm);
+        margin-bottom: var(--sm);
     }
 
     .nav-section-label {
-        font-size: var(--font-size-xs);
+        font-size: var(--xs);
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--color-ink-soft);
-        padding: var(--spacing-sm) var(--spacing-sm);
+        color: var(--color-text-muted);
+        padding: var(--sm) var(--sm);
         min-height: 24px;
     }
 
     .nav-link {
         display: flex;
         align-items: center;
-        gap: var(--spacing-md);
-        padding: var(--spacing-sm) var(--spacing-md);
-        border-radius: var(--radius-md);
-        color: var(--color-ink-soft);
+        gap: var(--xs);
+        /* padding: var(--xs) var(--sm); */
+        border-radius: var(--md);
+        color: var(--color-text-soft);
         text-decoration: none;
         font-weight: 500;
-        transition: all var(--transition-fast);
+        transition: all 0.1s ease;
         background: none;
         border: none;
         width: 100%;
@@ -360,9 +383,16 @@
         font-family: var(--font-family);
     }
 
-    .nav-link:hover {
+    .nav-link[aria-current="page"] {
+        background: var(--color-primary-100);
+        color: var(--color-text);
+        box-shadow: inset 3px 0 0 var(--color-primary);
+    }
+
+    .nav-link:hover,
+    .nav-link[aria-current="page"]:hover {
         background: var(--color-border-light);
-        color: var(--color-ink);
+        color: var(--color-text);
     }
 
     .nav-link svg {
@@ -391,10 +421,11 @@
     /* Main Content */
     .main-content {
         flex: 1;
-        background: var(--color-bg-secondary);
+        background: var(--color-surface);
         height: 100vh;
         transition: margin-left var(--transition-slow);
         overflow-y: auto;
+        padding: var(--xxl);
     }
 
     /* Responsive */
