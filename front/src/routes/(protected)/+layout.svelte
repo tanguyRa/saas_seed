@@ -189,7 +189,7 @@
                         {/if}
                     </a>
                     <a
-                        href="#"
+                        href="/"
                         class="nav-link logout-btn"
                         onclick={handleLogout}
                         aria-label={t("protected.sidebar.logout")}
@@ -346,13 +346,6 @@
         margin-top: auto;
         border-top: 1px solid var(--color-border);
         padding-top: var(--md);
-    }
-
-    .sidebar-language {
-        display: flex;
-        justify-content: flex-start;
-        padding: 0 var(--sm);
-        margin-bottom: var(--sm);
     }
 
     .nav-section-label {
