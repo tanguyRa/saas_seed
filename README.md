@@ -166,14 +166,6 @@ cd front
 npm run check
 ```
 
-Current frontend check status: no errors, a small number of warnings (accessibility/unused CSS) in protected layout.
-
-## Current Gaps / Notes
-
-- Go API currently exposes only ping + secured ping + Polar webhook endpoints.
-- Some scaffolding exists but is not wired into active routes yet (terminal socket/reconnect, storage usage in handlers, broader LLM usage).
-- `Makefile` target `test` references a `worker/` path that is not present in this repository.
-
 ## Contributing Tips
 
 - For new backend endpoints:

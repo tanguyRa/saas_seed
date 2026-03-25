@@ -107,7 +107,6 @@ stats:
 
 test:
 	${DEV_COMPOSE} exec -it ${BACKEND_SERVICE} go test ./...
-	docker run --rm --env-file .env.dev -v ./worker:/app -w /app golang:1.25-alpine sh -c "apk add --no-cache git >/dev/null && go test ./..."
 
 db_env:
 	op run --env-file=".env.dev" -- ${DEV_COMPOSE} exec -T ${BACKEND_SERVICE} sh -c 'printenv | grep DATABASE_URL'
